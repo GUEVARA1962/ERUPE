@@ -285,7 +285,7 @@ func handleMsgMhfUseKeepLoginBoost(s *Session, p mhfpacket.MHFPacket) {
 	doAckBufSucceed(s, pkt.AckHandle, resp.Data())
 }
 
-/*func handleMsgMhfGetUdSchedule(s *Session, p mhfpacket.MHFPacket) {
+func handleMsgMhfGetUdSchedule(s *Session, p mhfpacket.MHFPacket) {
 	pkt := p.(*mhfpacket.MsgMhfGetUdSchedule)
 	var t = timeServerFix.Tstatic_midnight()
 	year, month, day := t.Date()
@@ -307,9 +307,9 @@ func handleMsgMhfUseKeepLoginBoost(s *Session, p mhfpacket.MHFPacket) {
 	resp.WriteUint16(0x02)                                              // Unk 00000010
 
 	doAckBufSucceed(s, pkt.AckHandle, resp.Data())
-}*/
+}
 
-func handleMsgMhfGetUdSchedule(s *Session, p mhfpacket.MHFPacket) { //歌衛戦正式版
+/*func handleMsgMhfGetUdSchedule(s *Session, p mhfpacket.MHFPacket) { //歌衛戦正式版
 	pkt := p.(*mhfpacket.MsgMhfGetUdSchedule)
 	var t = timeServerFix.Tstatic_midnight()
 	var event int = s.server.erupeConfig.DevModeOptions.Event
@@ -320,24 +320,24 @@ func handleMsgMhfGetUdSchedule(s *Session, p mhfpacket.MHFPacket) { //歌衛戦�
 	// Diva Defense with Prayer, Interception and Song weeks
 	// Mezeporta Festival with simply 'available' being a weekend thing
 	resp := byteframe.NewByteFrame()
-	resp.WriteUint32(0x0b5397df) // Unk (1d5fda5c, 0b5397df)
+	resp.WriteUint32(0x1d5fda5c) // Unk (1d5fda5c, 0b5397df)
 
 	if event == 1 {
-		resp.WriteUint32(uint32(midnight.Add(-24 * 21 * time.Hour).Unix())) // Week 1 Timestamp, Festi start?
+		resp.WriteUint32(uint32(midnight.Add(24 * 21 * time.Hour).Unix())) // Week 1 Timestamp, Festi start?
 	} else {
 		resp.WriteUint32(uint32(midnight.Add(-24 * 21 * time.Hour).Unix())) // Week 1 Timestamp, Festi start?
 	}
 
 	if event == 2 {
-		resp.WriteUint32(uint32(midnight.Add(-24 * 14 * time.Hour).Unix())) // Week 2 Timestamp
-		resp.WriteUint32(uint32(midnight.Add(-24 * 14 * time.Hour).Unix())) // Week 2 Timestamp
+		resp.WriteUint32(uint32(midnight.Add(24 * 14 * time.Hour).Unix())) // Week 2 Timestamp
+		resp.WriteUint32(uint32(midnight.Add(24 * 14 * time.Hour).Unix())) // Week 2 Timestamp
 	} else {
 		resp.WriteUint32(uint32(midnight.Add(-24 * 14 * time.Hour).Unix())) // Week 2 Timestamp
 		resp.WriteUint32(uint32(midnight.Add(-24 * 14 * time.Hour).Unix())) // Week 2 Timestamp
 	}
 
 	if event == 3 {
-		resp.WriteUint32(uint32(midnight.Add((-24) * 7 * time.Hour).Unix())) // Diva Defense Interception
+		resp.WriteUint32(uint32(midnight.Add((24) * 7 * time.Hour).Unix()))  // Diva Defense Interception
 		resp.WriteUint32(uint32(midnight.Add((24) * 14 * time.Hour).Unix())) // Diva Defense Greeting Song
 	} else {
 		resp.WriteUint32(uint32(midnight.Add((-24) * 7 * time.Hour).Unix()))  // Diva Defense Interception
@@ -350,7 +350,7 @@ func handleMsgMhfGetUdSchedule(s *Session, p mhfpacket.MHFPacket) { //歌衛戦�
 	resp.WriteUint16(0x02) // Unk 00000010
 
 	doAckBufSucceed(s, pkt.AckHandle, resp.Data())
-}
+}*/
 
 /*
 func handleMsgMhfGetUdSchedule(s *Session, p mhfpacket.MHFPacket) {
