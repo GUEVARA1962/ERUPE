@@ -238,35 +238,59 @@ func handleMsgSysCastBinary(s *Session, p mhfpacket.MHFPacket) {
 					}
 					sendServerChatMessage(s, fmt.Sprintf("Ravi's current damage multiplier is %d", damageMultiplier))
 				}
+				//極ラヴィ変更
+				if strings.HasPrefix(chatMessage.Message, "!ravich") {
+					row := s.server.db.QueryRow("SELECT ravitype FROM raviregister WHERE refid = 12")
+					var ravitype uint32
+					err := row.Scan(&ravitype)
+					if err != nil {
+						panic(err)
+						return
+					}
+					if ravitype >= 0 {
+						sendServerChatMessage(s, fmt.Sprintf("Raviente Type changed"))
+						s.server.db.Exec("UPDATE raviregister SET ravitype = $1", 4)
+					} else {
+						sendServerChatMessage(s, fmt.Sprintf("Raviente Type already changed"))
+					}
+				}
 			}
 		}
 		// END OF RAVI COMMANDS
 
+		//フルコースON
 		if strings.HasPrefix(chatMessage.Message, "!preon") {
-			row := s.server.db.QueryRow("SELECT netcafe_points FROM characters WHERE id = $1", s.charID)
-			var netcafe_points int
-			err := row.Scan(&netcafe_points)
+			row := s.server.db.QueryRow("SELECT rights FROM users INNER JOIN characters ON users.id = characters.user_id WHERE characters.id = $1", int(s.charID))
+			var rights uint32
+			err := row.Scan(&rights)
 			if err != nil {
 				panic(err)
 				return
 			}
-			if netcafe_points >= 150000 {
-				row := s.server.db.QueryRow("SELECT rights FROM users INNER JOIN characters ON users.id = characters.user_id WHERE characters.id = $1", pkt.CharID)
-				var rights uint32
-				err := row.Scan(&rights)
-				if err != nil {
-					panic(err)
-					return
-				}
-				if rights == 14 {
-					sendServerChatMessage(s, fmt.Sprintf("Premium course applied"))
-					s.server.db.Exec("UPDATE users SET rights = $1 FROM characters WHERE users.id = characters.user_id AND characters.id = $2", 1073749838, int(s.charID))
-					s.server.db.Exec("UPDATE characters SET netcafe_points=netcafe_points::int - 150000 WHERE id=$1", s.charID)
-				} else {
-					sendServerChatMessage(s, fmt.Sprintf("Premium courses have already been applied"))
-				}
+			if rights == 14 {
+				sendServerChatMessage(s, fmt.Sprintf("Premium course applied"))
+				s.server.db.Exec("UPDATE users SET rights = $1 FROM characters WHERE users.id = characters.user_id AND characters.id = $2", 1073749838, int(s.charID))
 			} else {
-				sendServerChatMessage(s, fmt.Sprintf("Points are missing"))
+				sendServerChatMessage(s, fmt.Sprintf("Premium courses have already been applied"))
+			}
+			
+		}
+		
+
+		//フルコースOFF
+		if strings.HasPrefix(chatMessage.Message, "!preoff") {
+			row := s.server.db.QueryRow("SELECT rights FROM users INNER JOIN characters ON users.id = characters.user_id WHERE characters.id = $1", int(s.charID))
+			var rights uint32
+			err := row.Scan(&rights)
+			if err != nil {
+				panic(err)
+				return
+			}
+			if rights == 1073749838 {
+				sendServerChatMessage(s, fmt.Sprintf("Normal course applied"))
+				s.server.db.Exec("UPDATE users SET rights = $1 FROM characters WHERE users.id = characters.user_id AND characters.id = $2", 14, int(s.charID))
+			} else {
+				sendServerChatMessage(s, fmt.Sprintf("Normal courses have already been applied"))
 			}
 
 		}
