@@ -183,7 +183,7 @@ func handleMsgMhfGetKeepLoginBoostStatus(s *Session, p mhfpacket.MHFPacket) {
 		loginBoostStatus = append(loginBoostStatus, boost)
 	}
 	if len(loginBoostStatus) == 0 {
-		// create default Entries (should only been week 1 with )
+		// create default Entries (should only been week 1 with )デフォルトのエントリーを作成（1週目のみで良い）
 		insert = true
 		loginBoostStatus = []loginBoost{
 			{
@@ -227,7 +227,7 @@ func handleMsgMhfGetKeepLoginBoostStatus(s *Session, p mhfpacket.MHFPacket) {
 		if loginBoostStatus[d].WeekReq == CurrentWeek || loginBoostStatus[d].WeekCount != 0 {
 			loginBoostStatus[d].WeekCount = CurrentWeek
 		}
-		if !loginBoostStatus[d].Available && loginBoostStatus[d].WeekCount == loginBoostStatus[d].WeekReq && uint32(time.Now().In(time.FixedZone("Asia/Tokyo", 9*60*60)).Unix()) >= loginBoostStatus[d].Expiration {
+		if !loginBoostStatus[d].Available && loginBoostStatus[d].WeekCount >= loginBoostStatus[d].WeekReq && uint32(time.Now().In(time.FixedZone("Asia/Tokyo", 9*60*60)).Unix()) >= loginBoostStatus[d].Expiration { //WeekCount == loginBoostStatusから変更
 			loginBoostStatus[d].Expiration = 1
 		}
 		if !insert {
@@ -285,7 +285,7 @@ func handleMsgMhfUseKeepLoginBoost(s *Session, p mhfpacket.MHFPacket) {
 	doAckBufSucceed(s, pkt.AckHandle, resp.Data())
 }
 
-func handleMsgMhfGetUdSchedule(s *Session, p mhfpacket.MHFPacket) {
+/*func handleMsgMhfGetUdSchedule(s *Session, p mhfpacket.MHFPacket) {
 	pkt := p.(*mhfpacket.MsgMhfGetUdSchedule)
 	var t = timeServerFix.Tstatic_midnight()
 	year, month, day := t.Date()
@@ -307,9 +307,9 @@ func handleMsgMhfGetUdSchedule(s *Session, p mhfpacket.MHFPacket) {
 	resp.WriteUint16(0x02)                                              // Unk 00000010
 
 	doAckBufSucceed(s, pkt.AckHandle, resp.Data())
-}
+}*/
 
-/*func handleMsgMhfGetUdSchedule(s *Session, p mhfpacket.MHFPacket) { //歌衛戦正式版
+func handleMsgMhfGetUdSchedule(s *Session, p mhfpacket.MHFPacket) { //歌衛戦正式版
 	pkt := p.(*mhfpacket.MsgMhfGetUdSchedule)
 	var t = timeServerFix.Tstatic_midnight()
 	var event int = s.server.erupeConfig.DevModeOptions.Event
@@ -320,24 +320,24 @@ func handleMsgMhfGetUdSchedule(s *Session, p mhfpacket.MHFPacket) {
 	// Diva Defense with Prayer, Interception and Song weeks
 	// Mezeporta Festival with simply 'available' being a weekend thing
 	resp := byteframe.NewByteFrame()
-	resp.WriteUint32(0x1d5fda5c) // Unk (1d5fda5c, 0b5397df)
+	resp.WriteUint32(0x0b5397df) // Unk (1d5fda5c, 0b5397df)
 
 	if event == 1 {
-		resp.WriteUint32(uint32(midnight.Add(24 * 21 * time.Hour).Unix())) // Week 1 Timestamp, Festi start?
+		resp.WriteUint32(uint32(midnight.Add(-24 * 21 * time.Hour).Unix())) // Week 1 Timestamp, Festi start?
 	} else {
 		resp.WriteUint32(uint32(midnight.Add(-24 * 21 * time.Hour).Unix())) // Week 1 Timestamp, Festi start?
 	}
 
 	if event == 2 {
-		resp.WriteUint32(uint32(midnight.Add(24 * 14 * time.Hour).Unix())) // Week 2 Timestamp
-		resp.WriteUint32(uint32(midnight.Add(24 * 14 * time.Hour).Unix())) // Week 2 Timestamp
+		resp.WriteUint32(uint32(midnight.Add(-24 * 14 * time.Hour).Unix())) // Week 2 Timestamp
+		resp.WriteUint32(uint32(midnight.Add(-24 * 14 * time.Hour).Unix())) // Week 2 Timestamp
 	} else {
 		resp.WriteUint32(uint32(midnight.Add(-24 * 14 * time.Hour).Unix())) // Week 2 Timestamp
 		resp.WriteUint32(uint32(midnight.Add(-24 * 14 * time.Hour).Unix())) // Week 2 Timestamp
 	}
 
 	if event == 3 {
-		resp.WriteUint32(uint32(midnight.Add((24) * 7 * time.Hour).Unix()))  // Diva Defense Interception
+		resp.WriteUint32(uint32(midnight.Add((-24) * 7 * time.Hour).Unix())) // Diva Defense Interception
 		resp.WriteUint32(uint32(midnight.Add((24) * 14 * time.Hour).Unix())) // Diva Defense Greeting Song
 	} else {
 		resp.WriteUint32(uint32(midnight.Add((-24) * 7 * time.Hour).Unix()))  // Diva Defense Interception
@@ -350,7 +350,7 @@ func handleMsgMhfGetUdSchedule(s *Session, p mhfpacket.MHFPacket) {
 	resp.WriteUint16(0x02) // Unk 00000010
 
 	doAckBufSucceed(s, pkt.AckHandle, resp.Data())
-}*/
+}
 
 /*
 func handleMsgMhfGetUdSchedule(s *Session, p mhfpacket.MHFPacket) {
