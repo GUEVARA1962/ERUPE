@@ -128,5 +128,6 @@ func handleMsgMhfGetDistDescription(s *Session, p mhfpacket.MHFPacket) {
 	description, _ := stringsupport.ConvertUTF8ToShiftJIS(desc)
 	bf.WriteUint16(uint16(len(description)+1))
 	bf.WriteNullTerminatedBytes(description)
+	bf.WriteUint16(0)//ガイド受取クラッシュ回避
 	doAckBufSucceed(s, pkt.AckHandle, bf.Data())
 }
